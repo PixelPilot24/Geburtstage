@@ -1,6 +1,25 @@
 # Changelog
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [0.0.2] - 28.03.2024
+
+### Added
++ create.py
+  + birthdays_list() Methode zum Anzeigen und löschen der Geburtstage
+  + close_program() Methode fürs Schließen des Programms
+  + Menüleiste mit "Geburtstage löschen" und "Schließen" erstellt
++ delete.py
+  + Delete class
+    + create_window() Methode zum Erstellen eines Fensters zum Anzeigen oder löschen der Geburtstage
+
+### Changed
++ create.py
+  + die days Liste von int auf String umgestellt
+  + die Größe des Fensters angepasst
+  + von den Tagen und den Monaten OptionMenu durch Combobox ersetzt
+  + die pack Methode bei den Elementen durch place ersetzt
+
+
 ## [0.0.1] - 26.03.2024
 
 ### Added

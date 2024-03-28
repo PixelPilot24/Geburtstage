@@ -1,42 +1,64 @@
 import json
 from tkinter import *
+from tkinter import ttk
+from delete import Delete
 
 
 class CreateBirthday:
     dates = {}
-    days = [i for i in range(1, 32)]
+    days = [str(i) for i in range(1, 32)]
     months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
               "November", "Dezember"]
 
     def __init__(self):
         root = Tk()
         root.title("Geburtstage speichern")
-        root.geometry("270x270")
+        root.geometry("270x220")
 
         self.clicked_day = StringVar()
         self.clicked_month = StringVar()
         self.clicked_day.set("1")
         self.clicked_month.set("Januar")
 
-        Label(root, text="Name:").pack()
+        x_pos_1 = 20
+        x_pos_2 = x_pos_1 * 2 + 50
+
+        Label(root, text="Name:").place(x=x_pos_1, y=20)
         self.entry_name = Entry(root)
-        self.entry_name.pack()
+        self.entry_name.place(x=x_pos_2, y=20)
 
-        Label(root, text="Tag:").pack()
-        OptionMenu(root, self.clicked_day, *self.days).pack()
+        Label(root, text="Tag:").place(x=x_pos_1, y=50)
+        ttk.Combobox(root, textvariable=self.clicked_day, values=self.days, state="readonly").place(x=x_pos_2, y=50)
 
-        Label(root, text="Monat:").pack()
-        OptionMenu(root, self.clicked_month, *self.months).pack()
+        Label(root, text="Monat:").place(x=x_pos_1, y=80)
+        ttk.Combobox(root, textvariable=self.clicked_month, values=self.months, state="readonly").place(x=x_pos_2, y=80)
 
-        Label(root, text="Jahr:").pack()
+        Label(root, text="Jahr:").place(x=x_pos_1, y=110)
         self.entry_year = Entry(root)
-        self.entry_year.pack()
+        self.entry_year.place(x=x_pos_2, y=110)
 
-        Button(root, text="Speichern", command=self.birthday_save).pack()
+        Button(root, text="Speichern", command=self.birthday_save, width=10, height=2).place(x=95, y=150)
         self.error_text_label = Label(root, text="", fg="red")
-        self.error_text_label.pack()
+        self.error_text_label.pack(side="bottom")
+
+        menubar = Menu(root)
+        option_menu = Menu(menubar, tearoff=0)
+        option_menu.add_command(label="Geburtstage löschen", command=self.birthdays_list)
+        option_menu.add_separator()
+        option_menu.add_command(label="Schließen", command=self.close_program)
+        menubar.add_cascade(label="Optionen", menu=option_menu)
+
+        root.config(menu=menubar)
 
         root.mainloop()
+
+    @staticmethod
+    def birthdays_list():
+        Delete.create_window("das")
+
+    @staticmethod
+    def close_program():
+        exit()
 
     def error_text(self, text):
         self.error_text_label.config(text=text)
