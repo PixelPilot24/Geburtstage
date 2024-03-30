@@ -21,6 +21,7 @@ Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokument
   + create_birthday(self)
   + notification(name)
 
+
 ## [0.0.2] - 28.03.2024
 
 ### Added
