@@ -1,6 +1,26 @@
 # Changelog
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [0.1.0] - 30.03.2024
+
+### Added
++ delete.py
+  + init()
+  + create_window() Methode in die create_list() umbenannt()
+  + calculate_age()
+  + format_date() von YYYY-MM-DD zu DD.MM.YYYY
+  + remove_birthday() zum Löschen von Geburtstagen
++ create.py
+  + check_birthday() überprüft und benachrichtigt gleichzeitig
+
+### Changed
++ create.py, delete.py, main.py in den "src" Ordner verschoben
+
+### Removed
++ create.py
+  + create_birthday(self)
+  + notification(name)
+
 ## [0.0.2] - 28.03.2024
 
 ### Added
