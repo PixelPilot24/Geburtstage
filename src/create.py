@@ -5,16 +5,24 @@ from delete import Delete
 
 
 class CreateBirthday:
-    dates = {}
-    days = [str(i) for i in range(1, 32)]
+    """
+    Diese Klasse ermöglicht es über eine GUI die Geburtstage zu speichern.
+    """
+    dates = {}  # Eine Klassenvariable um die gespeicherten Geburtstage zu speichern
+    days = [str(i) for i in range(1, 32)]   # Liste aller möglichen Tage
     months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober",
-              "November", "Dezember"]
+              "November", "Dezember"]   # Liste aller möglichen Monate
 
     def __init__(self):
+        """
+        Initialisiert die GUI für die Eingabe von Geburtstagen.
+        """
+        # Erstellung eines Fensters
         root = Tk()
         root.title("Geburtstage speichern")
-        root.geometry("270x220")
+        root.geometry("300x220")
 
+        # Erstellung der GUI Elemente und ihre Platzierung
         self.clicked_day = StringVar()
         self.clicked_month = StringVar()
         self.clicked_day.set("1")
@@ -41,6 +49,7 @@ class CreateBirthday:
         self.error_text_label = Label(root, text="", fg="red")
         self.error_text_label.pack(side="bottom")
 
+        # Menüleiste
         menubar = Menu(root)
         option_menu = Menu(menubar, tearoff=0)
         option_menu.add_command(label="Geburtstage löschen", command=self.birthdays_list)
@@ -53,16 +62,31 @@ class CreateBirthday:
         root.mainloop()
 
     def birthdays_list(self):
+        """
+        Öffnet das Fenster wo die Geburtstage angezeigt und gelöscht werden können.
+        """
         Delete.create_list(Delete(), self.dates)
 
     @staticmethod
     def close_program():
+        """
+        Schließt das Programm.
+        """
         exit()
 
     def error_text(self, text):
+        """
+        Zeigt einen Fehlertext unten im Fenster an.
+        :param text: Der anzuzeigende Text.
+        """
         self.error_text_label.config(text=text)
 
-    def check_year(self, year) -> str:
+    def check_year(self, year: str) -> str:
+        """
+        Überprüft, ob das Jahr gültig ist. Falls nicht, wird ein entsprechender Fehlertext angezeigt.
+        :param year: Das eingegebene Jahr.
+        :return: Das gültige Jahr oder ein leerer String, wenn das Jahr ungültig ist.
+        """
         if len(year) == 0:
             self.error_text("Das Jahr darf nicht leer sein")
             return ""
@@ -82,12 +106,20 @@ class CreateBirthday:
 
     @staticmethod
     def check_int_len(num) -> str:
+        """
+        Überprüft die Länge von der Nummer. Falls die Nummer nur eine Stelle hat, dann wird davor eine 0 hinzugefügt.
+        :param num: Die zu überprüfende Nummer.
+        :return: Die Ausgabe ist ein String der immer 2 Stellen hat.
+        """
         if len(str(num)) == 1:
             return "0" + str(num)
         else:
             return str(num)
 
     def birthday_save(self):
+        """
+        Speichert den Namen und den Geburtstag in einer JSON Datei.
+        """
         name = self.entry_name.get()
         day = self.clicked_day.get()
         month_str = self.clicked_month.get()

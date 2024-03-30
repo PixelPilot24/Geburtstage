@@ -7,8 +7,15 @@ from create import CreateBirthday
 
 
 class Birthday:
+    """
+    Die Birthday-Klasse verwaltet Geburtstage und benachrichtigt über bevorstehende oder aktuelle Geburtstage.
+    """
     @classmethod
-    def check_birthdays(cls, dates):
+    def check_birthdays(cls, dates: dict):
+        """
+        Überprüft die Geburtstage in der Liste und benachrichtigt über heutige oder morgige Geburtstage.
+        :param dates: Eine Liste mit den Namen und Geburtstagen im JSON Format.
+        """
         today = datetime.date.today()
         tomorrow = (today + datetime.timedelta(days=1)).day
         day = today.day
@@ -35,7 +42,18 @@ class Birthday:
         if len(tomorrow_list) != 0:
             notification.notify(title="Morgen", message=" ".join(tomorrow_list), toast=True, timeout=3)
 
+    def open_window(self):
+        """
+        Öffnet ein Fenster zur Verwaltung der Geburtstage.
+        """
+        self.load_dates()
+        CreateBirthday()
+
     def load_dates(self):
+        """
+        Lädt Geburtstagsdaten aus einer JSON Datei.
+        Falls diese nicht vorhanden sein, dann wird eine neue Datei erstellt.
+        """
         file_name = "geburtstage.json"
 
         if os.path.isfile(file_name):
@@ -43,16 +61,11 @@ class Birthday:
             dates = json.load(file)
             CreateBirthday.dates = dates
 
-            if len(dates) == 0:
-                self.check_birthdays(dates)
-                CreateBirthday()
-            else:
-                self.check_birthdays(dates)
+            self.check_birthdays(dates)
         else:
             file = open(file_name, "w")
             json.dump({}, file)
-            CreateBirthday()
 
 
 if __name__ == "__main__":
-    Birthday.load_dates(Birthday())
+    Birthday.open_window(Birthday())

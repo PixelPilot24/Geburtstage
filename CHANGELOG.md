@@ -1,6 +1,17 @@
 # Changelog
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [0.1.1] - 30.03.2024
+
+### Added
++ autostart.py
++ Dokumentationen in main.py, create.py, delete.py
+
+### Changed
++ in allen Dateien bei den Methoden die Parameter benötigen, wurden die Datentypen hinzugefügt.
++ README.md angepasst
+
+
 ## [0.1.0] - 30.03.2024
 
 ### Added
