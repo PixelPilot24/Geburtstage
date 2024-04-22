@@ -1,7 +1,7 @@
 import os
 import json
 import datetime
-import check
+import validator
 import create
 
 from plyer import notification
@@ -23,17 +23,18 @@ class Birthday:
         month = today.month
         today_list = []
         tomorrow_list = []
+        vali = validator.DataValidator()
 
         for i in dates:
             birthday_day = int(dates[i][8:10])
             birthday_month = int(dates[i][5:7])
 
             if birthday_day == day and birthday_month == month:
-                age = check.calculate_age(dates[i])
+                age = vali.calculate_age(dates[i])
                 message = i + " ist " + str(age) + " Jahre alt geworden\n"
                 today_list.append(message)
             elif birthday_day == tomorrow and birthday_month == month:
-                age = check.calculate_age(dates[i]) + 1
+                age = vali.calculate_age(dates[i]) + 1
                 message = i + " wird " + str(age) + " Jahre alt werden\n"
                 tomorrow_list.append(message)
 
@@ -64,7 +65,7 @@ class Birthday:
 
             self.check_birthdays(dates)
         else:
-            check.save_in_json(dates={})
+            validator.DataValidator().save_in_json(dates={})
 
 
 if __name__ == "__main__":

@@ -2,10 +2,25 @@ import json
 import math
 from datetime import datetime
 from tkinter import messagebox
+from tkinter import *
 
 
-# todo überarbeiten. Checkmethoden so wie bei delete machen
-class CheckData:
+class DataValidator:
+    @staticmethod
+    def check_input(event: Event, text_entry: Entry, length=1):
+        text = text_entry.get()
+
+        if event.char.isdigit():
+            if len(text) > length:
+                text_entry.delete(length, END)
+        elif (event.keysym == "Tab"
+              or event.keysym == "BackSpace"
+              or event.keysym == "Left"
+              or event.keysym == "Right"):
+            return "continue"
+        else:
+            return "break"
+
     @staticmethod
     def check_int_len(num) -> str:
         """
@@ -77,18 +92,18 @@ class CheckData:
                 messagebox.showinfo("Tag", "Der Tag muss eine Zahl sein")
                 return ""
 
+    @staticmethod
+    def calculate_age(birthday_date: str) -> int:
+        """
+        Berechnung des Alters das angezeigt werden soll.
+        :param birthday_date: Das zu berechnende Geburtstagsdatum.
+        :return: Die Ausgabe zeigt das aktuelle Alter an.
+        """
+        date = datetime.strptime(birthday_date, "%Y-%m-%d")
 
-def calculate_age(birthday_date: str) -> int:
-    """
-    Berechnung des Alters das angezeigt werden soll.
-    :param birthday_date: Das zu berechnende Geburtstagsdatum.
-    :return: Die Ausgabe zeigt das aktuelle Alter an.
-    """
-    date = datetime.strptime(birthday_date, "%Y-%m-%d")
+        return math.floor((datetime.today() - date).days / 365.2422)
 
-    return math.floor((datetime.today() - date).days / 365.2422)
-
-
-def save_in_json(dates: dict):
-    file = open("geburtstage.json", "w")
-    json.dump(dates, file)
+    @staticmethod
+    def save_in_json(dates: dict):
+        file = open("geburtstage.json", "w")
+        json.dump(dates, file)

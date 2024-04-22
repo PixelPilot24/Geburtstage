@@ -1,9 +1,8 @@
-import check
 import createDataWindow
 
 from tkinter import *
 from tkinter import messagebox
-from check import CheckData
+from validator import DataValidator
 
 
 class CreateBirthday:
@@ -43,6 +42,16 @@ class CreateBirthday:
         self.month_entry.place(x=x_pos_entry, y=80)
         self.year_entry.place(x=x_pos_entry, y=110)
 
+        self.day_entry.bind("<FocusOut>", lambda event, e=self.day_entry: DataValidator.check_input(event, e))
+        self.month_entry.bind("<FocusOut>", lambda event, e=self.month_entry: DataValidator.check_input(event, e))
+        self.year_entry.bind("<FocusOut>",
+                             lambda event, e=self.year_entry: DataValidator.check_input(event, e, 3))
+
+        self.day_entry.bind("<Key>", lambda event, e=self.day_entry: DataValidator.check_input(event, e))
+        self.month_entry.bind("<Key>", lambda event, e=self.month_entry: DataValidator.check_input(event, e))
+        self.year_entry.bind("<Key>",
+                             lambda event, e=self.year_entry: DataValidator.check_input(event, e, 3))
+
         save_button = Button(master=self.root, text="Speichern", command=self.birthday_save)
         save_button.place(relx=0.5, y=170, anchor=CENTER)
 
@@ -56,7 +65,6 @@ class CreateBirthday:
         menubar.add_cascade(label="Optionen", menu=option_menu)
 
         self.root.config(menu=menubar)
-# todo: nach dem speichern sollen die Entry Felder wieder leer sein
 
     def birthday_save(self):
         """
@@ -67,19 +75,19 @@ class CreateBirthday:
         month = self.month_entry.get()
         year = self.year_entry.get()
 
-        day = CheckData.check_int_len(day)
-        month = CheckData.check_int_len(month)
+        day = DataValidator.check_int_len(day)
+        month = DataValidator.check_int_len(month)
 
         if len(name) == 0:
             messagebox.showinfo("Name", "Es muss ein Name eingegeben werden")
         else:
-            if (CheckData.check_day(day) != "" and
-                    CheckData.check_month(month) != "" and
-                    CheckData.check_year(year) != ""):
+            if (DataValidator.check_day(day) != "" and
+                    DataValidator.check_month(month) != "" and
+                    DataValidator.check_year(year) != ""):
                 # Wenn alle Daten Zahlen sind und in der richtigen Spanne sind, dann werden diese gespeichert
                 birthday = year + "-" + month + "-" + day
                 self.dates[name] = birthday
-                check.save_in_json(self.dates)
+                DataValidator.save_in_json(self.dates)
 
                 messagebox.showinfo("Speichern", "Daten wurden gespeichert")
                 self.name_entry.delete(0, len(name))

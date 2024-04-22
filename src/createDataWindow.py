@@ -1,4 +1,4 @@
-import check
+import validator
 
 from tkinter import *
 from tkinter import messagebox
@@ -11,6 +11,7 @@ class CreateDataWindow:
         self.inner_frame = Frame()
         self._new_dates = dates
         self._cache_dates = list(dates.keys())
+        self.validator = validator.DataValidator()
 
     def __initial_window(self):
         self.root = Tk()
@@ -21,9 +22,8 @@ class CreateDataWindow:
     def __on_mouse_wheel(self, event: Event):
         self.canvas.xview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    @staticmethod
-    def _text_label_str(name: str, date: str) -> str:
-        age = check.calculate_age(date)
+    def _text_label_str(self, name: str, date: str) -> str:
+        age = self.validator.calculate_age(date)
         new_date = date[8:10] + "." + date[5:7] + "." + date[0:4]
 
         return f"{name}\n{age} Jahre\n{new_date}"
@@ -33,7 +33,7 @@ class CreateDataWindow:
         menu = Menu(master=label, tearoff=0)
 
         menu.add_command(label="Bearbeiten", command=lambda:
-                         data_handler.edit_data(name, date, frame, label, index))
+                         data_handler.edit_data(name, date, frame, label, index, self.root))
         menu.add_command(label="Löschen", command=lambda: data_handler.remove_birthday(index, frame, self.root))
 
         label.bind("<Button-3>", lambda event: menu.post(event.x_root, event.y_root))
@@ -97,48 +97,43 @@ class DataHandler(CreateDataWindow):
         if delete_option:
             self._new_dates.pop(name)
             frame.pack_forget()
-            check.save_in_json(self._new_dates)
+            self.validator.save_in_json(self._new_dates)
 
         root.focus_force()
 
-    @staticmethod
-    def __on_key_press(event: Event, entry: Entry, length=1):
-        text = entry.get()
-
-        if (event.char.isdigit()
-                or event.keysym == "BackSpace"
-                or event.keysym == "Left"
-                or event.keysym == "Right"):
-            if len(text) > length:
-                entry.delete(length, END)
-        else:
-            return "break"
-
     def __save_change(self, day: str, month: str, year: str, name: str, old_name: str, index: int,
-                      frame: Frame, entry_frame: Frame):
-        entry_frame.pack_forget()
+                      frame: Frame, entry_frame: Frame, root: Tk):
         date = f"{year}-{month}-{day}"
+        vali = validator.DataValidator()
 
-        if name == old_name:
-            self._new_dates[old_name] = date
-        else:
-            self._new_dates.pop(old_name)
-            self._new_dates[name] = date
+        if (vali.check_day(day) != "" and
+                vali.check_month(month) != "" and
+                vali.check_year(year) != ""):
+            entry_frame.pack_forget()
+            if name == old_name:
+                self._new_dates[old_name] = date
+            else:
+                self._new_dates.pop(old_name)
+                self._new_dates[name] = date
 
-        dates_text = self._text_label_str(name, date)
-        text_label = Label(master=frame, text=dates_text, padx=5)
+            dates_text = self._text_label_str(name, date)
+            text_label = Label(master=frame, text=dates_text, padx=5)
 
-        text_label.pack(side=LEFT)
-        self._add_menu(name, date, frame, text_label, index)
+            text_label.pack(side=LEFT)
+            self._add_menu(name, date, frame, text_label, index)
 
-        self.inner_frame.update_idletasks()
-        check.save_in_json(self._new_dates)
+            self.inner_frame.update_idletasks()
 
-    def edit_data(self, name: str, date: str, frame: Frame, text_label: Label, index: int):
+            self.validator.save_in_json(self._new_dates)
+
+        root.focus_force()
+
+    def edit_data(self, name: str, date: str, frame: Frame, text_label: Label, index: int, root: Tk):
         split_date = date.split("-")
         day = split_date[2]
         month = split_date[1]
         year = split_date[0]
+        vali = validator.DataValidator()
 
         text_label.pack_forget()
 
@@ -150,16 +145,16 @@ class DataHandler(CreateDataWindow):
         save_button = Button(master=entry_frame, text="Speichern", anchor=CENTER)
 
         save_button.config(command=lambda n=name, e=entry_frame: self.__save_change(
-            day_entry.get(), month_entry.get(), year_entry.get(), name_entry.get(), n, index, frame, e))
+            day_entry.get(), month_entry.get(), year_entry.get(), name_entry.get(), n, index, frame, e, root))
 
         name_entry.insert(0, name)
         day_entry.insert(0, day)
         month_entry.insert(0, month)
         year_entry.insert(0, year)
 
-        day_entry.bind("<Key>", lambda event, e=day_entry: self.__on_key_press(event, e))
-        month_entry.bind("<Key>", lambda event, e=month_entry: self.__on_key_press(event, e))
-        year_entry.bind("<Key>", lambda event, e=year_entry: self.__on_key_press(event, e, 3))
+        day_entry.bind("<Key>", lambda event, e=day_entry: vali.check_input(event, e))
+        month_entry.bind("<Key>", lambda event, e=month_entry: vali.check_input(event, e))
+        year_entry.bind("<Key>", lambda event, e=year_entry: vali.check_input(event, e, 3))
 
         name_entry.pack()
         day_entry.pack()
