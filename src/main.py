@@ -1,9 +1,10 @@
 import os
 import json
 import datetime
-from delete import Delete
+import check
+import create
+
 from plyer import notification
-from create import CreateBirthday
 
 
 class Birthday:
@@ -28,11 +29,11 @@ class Birthday:
             birthday_month = int(dates[i][5:7])
 
             if birthday_day == day and birthday_month == month:
-                age = Delete.calculate_age(dates[i])
+                age = check.calculate_age(dates[i])
                 message = i + " ist " + str(age) + " Jahre alt geworden\n"
                 today_list.append(message)
             elif birthday_day == tomorrow and birthday_month == month:
-                age = Delete.calculate_age(dates[i]) + 1
+                age = check.calculate_age(dates[i]) + 1
                 message = i + " wird " + str(age) + " Jahre alt werden\n"
                 tomorrow_list.append(message)
 
@@ -47,7 +48,7 @@ class Birthday:
         Öffnet ein Fenster zur Verwaltung der Geburtstage.
         """
         self.load_dates()
-        CreateBirthday()
+        create.CreateBirthday()
 
     def load_dates(self):
         """
@@ -59,12 +60,11 @@ class Birthday:
         if os.path.isfile(file_name):
             file = open(file_name, "r")
             dates = json.load(file)
-            CreateBirthday.dates = dates
+            create.CreateBirthday.dates = dates
 
             self.check_birthdays(dates)
         else:
-            file = open(file_name, "w")
-            json.dump({}, file)
+            check.save_in_json(dates={})
 
 
 if __name__ == "__main__":
