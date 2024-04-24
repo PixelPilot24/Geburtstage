@@ -103,7 +103,3 @@ class DataValidator:
 
         return math.floor((datetime.today() - date).days / 365.2422)
 
-    @staticmethod
-    def save_in_json(dates: dict):
-        file = open("geburtstage.json", "w")
-        json.dump(dates, file)
