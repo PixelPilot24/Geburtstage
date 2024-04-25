@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from validator import DataValidator as Validator
 from json_handler import JsonHandler as Json
+from create import CreateBirthday as Create
 
 
 class BaseGUI:
@@ -10,7 +11,6 @@ class BaseGUI:
         self.__root = Tk()
         self.__canvas = Canvas(master=self.__root, scrollregion=(0, 0, 700, 700))
         self.__inner_frame = Frame(master=self.__canvas)
-        self.__frame_dict = {}
         self.__setup_window()
 
     def __setup_window(self):
@@ -18,7 +18,11 @@ class BaseGUI:
         self.__root.focus_force()
         self.__canvas.bind_all("<MouseWheel>", self.__on_mouse_wheel)
         self.__canvas.create_window((0, 0), window=self.__inner_frame, anchor=NW)
-        self.__create_widgets()
+        create_widgets(self.__dates, self.__inner_frame)
+        self.__canvas.update_idletasks()
+        self.__resize_window()
+        self.__create_scrollbar()
+        self.__create_menubar()
 
     def __on_mouse_wheel(self, event: Event):
         self.__canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
@@ -33,12 +37,12 @@ class BaseGUI:
             frame = Frame(master=self.__inner_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
             BirthdayLabel(frame, name, date, pad, self.__inner_frame)
             frame.grid(row=row, column=column, padx=pad, pady=pad)
-            self.__frame_dict[name] = frame
             index += 1
 
         self.__canvas.update_idletasks()
         self.__resize_window()
         self.__create_scrollbar()
+        self.__create_menubar()
 
     def __create_scrollbar(self):
         self.__canvas.config(scrollregion=self.__canvas.bbox(ALL))
@@ -55,17 +59,45 @@ class BaseGUI:
         self.__canvas.pack(fill=BOTH, expand=True)
 
     def __resize_window(self):
-        width = self.__inner_frame.winfo_reqwidth() + 21
+        if len(self.__dates) < 3:
+            width = 200
+        else:
+            width = self.__inner_frame.winfo_reqwidth() + 21
 
         self.__root.geometry(f"{width}x{width}")
+
+    def __create_menubar(self):
+        menubar = Menu(self.__root)
+        option_menu = Menu(master=menubar, tearoff=0)
+        option_menu.add_command(label="Neu", command=lambda: Create(self.__root, self.__inner_frame).run())
+        option_menu.add_separator()
+        option_menu.add_command(label="Schließen", command=lambda: exit())
+        menubar.add_cascade(label="Optionen", menu=option_menu)
+
+        self.__root.config(menu=menubar)
 
     def run(self):
         self.__root.mainloop()
 
 
+def create_widgets(dates: dict, inner_frame: Frame):
+    for widget in inner_frame.winfo_children():
+        widget.destroy()
+    index = 0
+    pad = 5
+
+    for name, date in dates.items():
+        row = index // 6
+        column = index - (row * 6)
+        frame = Frame(master=inner_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
+        BirthdayLabel(frame, name, date, pad, inner_frame)
+        frame.grid(row=row, column=column, padx=pad, pady=pad)
+        index += 1
+
+
 class BirthdayLabel:
-    def __init__(self, frame: Frame, name: str, date: str, pad: int, canvas):
-        self.canvas = canvas
+    def __init__(self, frame: Frame, name: str, date: str, pad: int, inner_frame: Frame):
+        self.__inner_frame = inner_frame
         self.__frame = frame
         self.__name = name
         self.__date = date
@@ -155,4 +187,4 @@ class BirthdayLabel:
             self.__dates = Json().json_data
             self.__dates.pop(name)
             Json().save_in_json(self.__dates)
-            self.__frame.destroy()
+            create_widgets(self.__dates, self.__inner_frame)

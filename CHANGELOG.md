@@ -2,6 +2,21 @@
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
 
+## [2.0.0] - 25.04.2024
+### Changed
++ es wird jetzt anstatt das Erstellen des Geburtstages, die Liste mit den Geburtstagen als erstes Fenster angezeigt
++ [createDataWindow.py](https://github.com/PixelPilot24/Geburtstage/blob/2.0.0/src/createDataWindow.py)
+  + [create_widgets()](https://github.com/PixelPilot24/Geburtstage/blob/2.0.0/src/createDataWindow.py#L83) wurde aus
+  der Klasse herausgenommen, da nach dem Löschen und dem Erstellen eines Geburtstages die Widgets erneut erstellt werden
+  + die Menübar wird in
+  [create_widgets()](https://github.com/PixelPilot24/Geburtstage/blob/2.0.0/src/createDataWindow.py#L69) erstellt
+  + in [__resize_window()](https://github.com/PixelPilot24/Geburtstage/blob/2.0.0/src/createDataWindow.py#L61) wurde
+  ein If Statement eingefügt, falls es weniger als 3 Daten gibt, dann wird eine bestimmte Größe vom Fenster erzeugt
++ [create.py](https://github.com/PixelPilot24/Geburtstage/blob/2.0.0/src/create.py) angepasst, anstatt das in der init
+ein Tk() erstellt wird, wird ein Toplevel erstellt
+  + alle Attribute und Methoden wurden auf private gestellt
+
+
 ## [1.0.0] - 24.04.2024
 ### Added
 + [json_handler.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/json_handler.py) in der Datei wird die
