@@ -2,6 +2,25 @@
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
 
+## [2.2.0] - 25.04.2024
+### Added
++ Dokumentation geschrieben
++ README.md überarbeitet
+
+### Changed
++ [createDataWindow.py](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/createDataWindow.py) umbenannt in
+[baseWindow.py](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/baseWindow.py)
+  + [__edit_birthday()](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/baseWindow.py#L119) überarbeitet.
+  Das Bearbeiten von den Daten läuft jetzt über das Fenster von
+  [create.py](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/create.py)
++ [create.py](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/create.py)
+  + [self.__top_level](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/create.py) wurde zu
+  [self.__root](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/create.py)
+  + neue Parameter bei [init](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/create.py#L14) für die Bearbeitung
+  + der Titel wird geändert je nachdem, ob bearbeitet oder erstellt wird
+  + in [__birthday_save()](https://github.com/PixelPilot24/Geburtstage/blob/2.2.0/src/create.py#L91) wurde ein If
+  Statement hinzugefügt um, falls der Name geändert wird, den alten Namen zu löschen
+
 ## [2.1.0] - 25.04.2024
 ### Added
 + [search.py](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/search.py)

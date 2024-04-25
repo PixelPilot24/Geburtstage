@@ -8,6 +8,12 @@ from tkinter import *
 class DataValidator:
     @staticmethod
     def check_input(event: Event, text_entry: Entry, length=1):
+        """
+        Überprüft, ob die Eingabe eine Zahl ist und das diese die richtige Länge hat.
+        :param event:
+        :param text_entry: Der eingegebene Text der überprüft werden soll.
+        :param length: Die passende Länge, die der Text haben darf - 1.
+        """
         text = text_entry.get()
 
         if event.char.isdigit():
@@ -58,6 +64,11 @@ class DataValidator:
 
     @staticmethod
     def check_month(month: str) -> str:
+        """
+        Überprüft, ob der Monat gültig ist. Falls nicht, wird ein entsprechender Fehlertext angezeigt.
+        :param month: Der eingegebene Monat.
+        :return: Der gültige Monat oder ein leerer String, wenn der Monat ungültig ist.
+        """
         if len(month) == 0:
             messagebox.showinfo("Monat", "Der Monat darf nicht leer sein")
             return ""
@@ -76,6 +87,11 @@ class DataValidator:
 
     @staticmethod
     def check_day(day: str) -> str:
+        """
+        Überprüft, ob der Tag gültig ist. Falls nicht, wird ein entsprechender Fehlertext angezeigt.
+        :param day: Der eingegebene Tag.
+        :return: Der gültige Tag oder ein leerer String, wenn der Tag ungültig ist.
+        """
         if len(day) == 0:
             messagebox.showinfo("Tag", "Der Tag darf nicht leer sein")
             return ""

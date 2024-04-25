@@ -16,28 +16,24 @@ Mit dieser Anwendung können Geburtstage gespeichert werden. Einmal täglich wir
 ob eine Person an diesem Tag Geburtstag hat.
 
 ## Verwendung
-Die main.py Datei ausführen. Man wird zu einem Fenster weitergeleitet, indem der Name
-und das Geburtsdatum eingetragen wird. Die autostart.py Datei kann dafür verwendet werden,
+Die main.py Datei ausführen. In dem Fenster kann man unter Optionen einen neuen Geburtstag eintragen oder in der Sammlung
+bereits gespeicherte Geburtstage bearbeiten oder löschen. Die autostart.py Datei kann dafür verwendet werden,
 wenn das Programm bei einem PC Start automatisch ausgeführt werden soll.
 
 ## Anleitung
-Die main.py Datei ausführen und dort sieht man leere Felder, in die man die entsprechenden Daten eintragen soll.
+Die main.py Datei ausführen und es erscheint ein leeres Fenster mit einer Suche. In der Menüleiste ist es möglich einen
+neuen Geburtstag einzutragen.
 
-![erstes Bild](images/empty_fields.png)
+![erstes Bild](images/new_birthday.png)
 
-Wenn die Daten korrekt eingetragen wurden, erscheint im unteren Rand des Fensters eine Benachrichtigung, das die Daten
-erfolgreich gespeichert wurden.
+In dem neuen Fenster können die erforderlichen Daten eingetragen und im Anschluss gespeichert werden.
 
-![zweites Bild](images/example_dates.png)
+![zweites Bild](images/example_create.png)
 
-Falls die Daten gelöscht oder angeschaut werden sollen, dann geht das über die Menüleiste unter "Option"
-und "Geburtstage löschen".
+Falls es notwendig ist, kann der Geburtstag bearbeitet oder gelöscht werden.
 
-![drittes Bild](images/menu.png)
+![drittes Bild](images/example_menu.png)
 
-Danach erscheint ein weiteres Fenster, indem die Löschung vorgenommen werden kann. 
-
-![viertes Bild](images/delete_window.png)
 
 ### Autostart
 1. Mit den Tasten Windows&#x229E; + R das "Ausführen" Fenster öffnen

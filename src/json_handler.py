@@ -3,6 +3,9 @@ import os.path
 
 
 class JsonHandler:
+    """
+    In dieser Klasse wird die JSON Datei gespeichert, geladen und abgerufen.
+    """
     __file_name = "geburtstage.json"
     __json_data = {}
 

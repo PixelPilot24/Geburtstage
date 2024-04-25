@@ -7,6 +7,9 @@ from search import SearchBirthday as Search
 
 
 class BaseGUI:
+    """
+    Eine Klasse die das Hauptfenster der Anwendung erstellt.
+    """
     def __init__(self):
         self.__dates = Json().json_data
         self.__root = Tk()
@@ -17,6 +20,9 @@ class BaseGUI:
         self.__setup_window()
 
     def __setup_window(self):
+        """
+        Erstellt das Hauptfenster mit den Widgets und Funktionen
+        """
         self.__root.title("Geburtstage Liste")
         self.__root.focus_force()
         self.__canvas.bind_all("<MouseWheel>", self.__on_mouse_wheel)
@@ -31,9 +37,16 @@ class BaseGUI:
         self.__create_menubar()
 
     def __on_mouse_wheel(self, event: Event):
+        """
+        Ermöglicht das Scrollen im Hauptfenster
+        :param event:
+        """
         self.__canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def __create_scrollbar(self):
+        """
+        Erstellt die horizontale und vertikale Scrollleiste für den Canvas
+        """
         self.__canvas.config(scrollregion=self.__canvas.bbox(ALL))
         scrollbar_x = Scrollbar(master=self.__root, orient=HORIZONTAL)
         scrollbar_y = Scrollbar(master=self.__root, orient=VERTICAL)
@@ -48,17 +61,17 @@ class BaseGUI:
         self.__canvas.pack(fill=BOTH, expand=True)
 
     def __resize_window(self):
-        if len(self.__dates) < 3:
-            width = 200
-        else:
-            width = self.__inner_frame.winfo_reqwidth() + 21
+        width = self.__inner_frame.winfo_reqwidth() + 21
 
         self.__root.geometry(f"{width}x{width}")
 
     def __create_menubar(self):
+        """
+        Erstellt das Menü mit Optionen für die Anwendung.
+        """
         menubar = Menu(self.__root)
         option_menu = Menu(master=menubar, tearoff=0)
-        option_menu.add_command(label="Neu", command=lambda: Create(self.__root, self.__widget_frame).run())
+        option_menu.add_command(label="Neu", command=lambda: Create(self.__widget_frame).run())
         option_menu.add_separator()
         option_menu.add_command(label="Schließen", command=lambda: exit())
         menubar.add_cascade(label="Optionen", menu=option_menu)
@@ -70,6 +83,11 @@ class BaseGUI:
 
 
 def create_widgets(dates: dict, widget_frame: Frame):
+    """
+    Löscht zuerst alle vorhandenen Widgets und erstellt, anhand der übergebenen Daten, eine neue Anzeige mit den Widgets.
+    :param dates: Daten von dem jeweiligen Namen und Geburtstag.
+    :param widget_frame: Frame von den Widgets.
+    """
     for widget in widget_frame.winfo_children():
         widget.destroy()
     index = 0
@@ -85,6 +103,9 @@ def create_widgets(dates: dict, widget_frame: Frame):
 
 
 class BirthdayLabel:
+    """
+    In dieser Klasse wird das Label erstellt.
+    """
     def __init__(self, frame: Frame, name: str, date: str, pad: int, inner_frame: Frame):
         self.__inner_frame = inner_frame
         self.__frame = frame
@@ -94,14 +115,21 @@ class BirthdayLabel:
         self.__create_label()
 
     def __create_label(self):
+        """
+        Erstellt das passende Label mit dem Bearbeitungsmenü.
+        """
         pad = self.__pad
         dates_text = self.__text_label_str()
 
         text_label = Label(master=self.__frame, text=dates_text, padx=pad, pady=pad)
-        text_label.pack()  # side=LEFT
+        text_label.pack()
         self.__add_menu(text_label)
 
     def __text_label_str(self) -> str:
+        """
+        Erstellt den passenden Text für das Textlabel.
+        :return: Es wird der formatierte Text ausgegeben.
+        """
         date = self.__date
         validator = Validator()
         age = validator.calculate_age(date)
@@ -110,65 +138,30 @@ class BirthdayLabel:
         return f"{self.__name}\n{age} Jahre\n{new_date}"
 
     def __add_menu(self, text_label: Label):
+        """
+        Das Menü wird erstellt, mit dem man den Geburtstag bearbeiten oder löschen kann.
+        :param text_label: Das richtige Label wird mitgegeben,
+        damit nicht das falsche Label bearbeitet oder gelöscht wird.
+        """
         menu = Menu(master=text_label, tearoff=0)
-        menu.add_command(label="Bearbeiten", command=lambda: self.__edit_birthday(text_label))
+        menu.add_command(label="Bearbeiten", command=lambda: self.__edit_birthday())
         menu.add_command(label="Löschen", command=self.__remove_birthday)
 
         text_label.bind("<Button-3>", lambda event: menu.post(event.x_root, event.y_root))
 
-    def __edit_birthday(self, text_label: Label):
-        name = self.__name
-        date = self.__date
-        split_date = date.split("-")
+    def __edit_birthday(self):
+        """
+        Es wird das Fenster vom Erstellen des Geburtstages, mit den zu bearbeitenden Parametern, geöffnet.
+        """
+        split_date = self.__date.split("-")
         day, month, year = split_date[2], split_date[1], split_date[0]
-        validator = Validator()
 
-        text_label.pack_forget()
-
-        entry_frame = Frame(master=self.__frame)
-        name_entry = Entry(master=entry_frame)
-        day_entry = Entry(master=entry_frame, width=4, justify=CENTER)
-        month_entry = Entry(master=entry_frame, width=4, justify=CENTER)
-        year_entry = Entry(master=entry_frame, width=6, justify=CENTER)
-        save_button = Button(master=entry_frame, text="Speichern", anchor=CENTER)
-
-        name_entry.insert(0, name)
-        day_entry.insert(0, day)
-        month_entry.insert(0, month)
-        year_entry.insert(0, year)
-
-        save_button.config(command=lambda: self.__save_change(
-            name_entry.get(), [day_entry.get(), month_entry.get(), year_entry.get()], entry_frame))
-
-        day_entry.bind("<Key>", lambda event, e=day_entry: validator.check_input(event, e))
-        month_entry.bind("<Key>", lambda event, e=month_entry: validator.check_input(event, e))
-        year_entry.bind("<Key>", lambda event, e=year_entry: validator.check_input(event, e, 3))
-
-        name_entry.pack()
-        day_entry.pack()
-        month_entry.pack()
-        year_entry.pack()
-        save_button.pack()
-        entry_frame.pack()
-
-    def __save_change(self, name: str, date: list, entry_frame: Frame):
-        validator = Validator()
-        day, month, year = date[0], date[1], date[2]
-        new_date = f"{year}-{month}-{day}"
-
-        if (validator.check_day(day) != ""
-                and validator.check_month(month) != ""
-                and validator.check_year(year) != ""):
-            entry_frame.pack_forget()
-            self.__dates = Json().json_data
-            self.__dates.pop(self.__name)
-            self.__dates[name] = new_date
-            self.__name = name
-            self.__date = new_date
-            self.__create_label()
-            Json().save_in_json(self.__dates)
+        Create(self.__inner_frame, self.__name, day, month, year).run()
 
     def __remove_birthday(self):
+        """
+        Es wird abgefragt, ob der Geburtstag gelöscht werden soll, wenn ja, dann wird dieser gelöscht und gespeichert.
+        """
         name = self.__name
         delete_option = messagebox.askyesno(
             "Löschen", f"Sollen die Daten von {name} wirklich gelöscht werden?")

@@ -3,17 +3,17 @@ import validator
 
 from plyer import notification
 from json_handler import JsonHandler as Json
-from createDataWindow import BaseGUI
+from baseWindow import BaseGUI
 
 
 class Birthday:
     """
-    Die Birthday-Klasse verwaltet Geburtstage und benachrichtigt über bevorstehende oder aktuelle Geburtstage.
+    Eine Klasse, um Geburtstage zu überprüfen und Benachrichtigungen anzuzeigen.
     """
     @staticmethod
     def check_birthdays():
         """
-        Überprüft die Geburtstage in der Liste und benachrichtigt über heutige oder morgige Geburtstage.
+        Überprüft Geburtstage für heute und morgen aus der JSON-Datei und zeigt Benachrichtigungen an, wenn es welche gibt.
         """
         dates = Json().json_data
         today = datetime.date.today()
@@ -45,6 +45,10 @@ class Birthday:
 
     @classmethod
     def run(cls):
+        """
+        Lädt die JSON-Datei, überprüft die Geburtstage und zeigt Benachrichtigungen an. Startet auch die GUI.
+        :return:
+        """
         Json().load_json_file()
         cls.check_birthdays()
         BaseGUI().run()
