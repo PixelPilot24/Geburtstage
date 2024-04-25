@@ -84,7 +84,5 @@ class CreateBirthday:
                 createDW.create_widgets(dates, self.__inner_frame)
                 self.__top_level.destroy()
 
-        self.__top_level.focus_force()
-
     def run(self):
         self.__top_level.mainloop()

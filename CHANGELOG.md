@@ -2,6 +2,19 @@
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
 
+## [2.1.0] - 25.04.2024
+### Added
++ [search.py](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/search.py)
+  + Suchfunktion um in der Geburtstagsliste nach bestimmten Namen zu suchen
+
+### Changed
++ [createDataWindow.py](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/createDataWindow.py)
+  + die Attribute [__search_frame](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/createDataWindow.py#L15)
+  und [__widget_frame](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/createDataWindow.py#L16) erstellt um
+  die Widgets und die Suche zu trennen
+  + in [__save_change](https://github.com/PixelPilot24/Geburtstage/blob/2.1.0/src/createDataWindow.py#L154) eine Methode,
+  für die Löschung des alten Namen nach der Bearbeitung, hinzugefügt
+
 ## [2.0.0] - 25.04.2024
 ### Changed
 + es wird jetzt anstatt das Erstellen des Geburtstages, die Liste mit den Geburtstagen als erstes Fenster angezeigt

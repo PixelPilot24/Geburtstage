@@ -3,6 +3,7 @@ from tkinter import messagebox
 from validator import DataValidator as Validator
 from json_handler import JsonHandler as Json
 from create import CreateBirthday as Create
+from search import SearchBirthday as Search
 
 
 class BaseGUI:
@@ -11,6 +12,8 @@ class BaseGUI:
         self.__root = Tk()
         self.__canvas = Canvas(master=self.__root, scrollregion=(0, 0, 700, 700))
         self.__inner_frame = Frame(master=self.__canvas)
+        self.__search_frame = Frame(master=self.__inner_frame)
+        self.__widget_frame = Frame(master=self.__inner_frame)
         self.__setup_window()
 
     def __setup_window(self):
@@ -18,7 +21,10 @@ class BaseGUI:
         self.__root.focus_force()
         self.__canvas.bind_all("<MouseWheel>", self.__on_mouse_wheel)
         self.__canvas.create_window((0, 0), window=self.__inner_frame, anchor=NW)
-        create_widgets(self.__dates, self.__inner_frame)
+        Search(self.__search_frame, self.__widget_frame)
+        create_widgets(self.__dates, self.__widget_frame)
+        self.__search_frame.pack(anchor=NW)
+        self.__widget_frame.pack()
         self.__canvas.update_idletasks()
         self.__resize_window()
         self.__create_scrollbar()
@@ -26,23 +32,6 @@ class BaseGUI:
 
     def __on_mouse_wheel(self, event: Event):
         self.__canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    def __create_widgets(self):
-        index = 0
-        pad = 5
-
-        for name, date in self.__dates.items():
-            row = index // 6
-            column = index - (row * 6)
-            frame = Frame(master=self.__inner_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
-            BirthdayLabel(frame, name, date, pad, self.__inner_frame)
-            frame.grid(row=row, column=column, padx=pad, pady=pad)
-            index += 1
-
-        self.__canvas.update_idletasks()
-        self.__resize_window()
-        self.__create_scrollbar()
-        self.__create_menubar()
 
     def __create_scrollbar(self):
         self.__canvas.config(scrollregion=self.__canvas.bbox(ALL))
@@ -69,7 +58,7 @@ class BaseGUI:
     def __create_menubar(self):
         menubar = Menu(self.__root)
         option_menu = Menu(master=menubar, tearoff=0)
-        option_menu.add_command(label="Neu", command=lambda: Create(self.__root, self.__inner_frame).run())
+        option_menu.add_command(label="Neu", command=lambda: Create(self.__root, self.__widget_frame).run())
         option_menu.add_separator()
         option_menu.add_command(label="Schließen", command=lambda: exit())
         menubar.add_cascade(label="Optionen", menu=option_menu)
@@ -80,8 +69,8 @@ class BaseGUI:
         self.__root.mainloop()
 
 
-def create_widgets(dates: dict, inner_frame: Frame):
-    for widget in inner_frame.winfo_children():
+def create_widgets(dates: dict, widget_frame: Frame):
+    for widget in widget_frame.winfo_children():
         widget.destroy()
     index = 0
     pad = 5
@@ -89,8 +78,8 @@ def create_widgets(dates: dict, inner_frame: Frame):
     for name, date in dates.items():
         row = index // 6
         column = index - (row * 6)
-        frame = Frame(master=inner_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
-        BirthdayLabel(frame, name, date, pad, inner_frame)
+        frame = Frame(master=widget_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
+        BirthdayLabel(frame, name, date, pad, widget_frame)
         frame.grid(row=row, column=column, padx=pad, pady=pad)
         index += 1
 
@@ -172,6 +161,7 @@ class BirthdayLabel:
                 and validator.check_year(year) != ""):
             entry_frame.pack_forget()
             self.__dates = Json().json_data
+            self.__dates.pop(self.__name)
             self.__dates[name] = new_date
             self.__name = name
             self.__date = new_date
