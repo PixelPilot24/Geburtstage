@@ -1,22 +1,21 @@
-import os
-import json
 import datetime
 import validator
-import create
 
 from plyer import notification
+from json_handler import JsonHandler as Json
+from createDataWindow import BaseGUI
 
 
 class Birthday:
     """
     Die Birthday-Klasse verwaltet Geburtstage und benachrichtigt über bevorstehende oder aktuelle Geburtstage.
     """
-    @classmethod
-    def check_birthdays(cls, dates: dict):
+    @staticmethod
+    def check_birthdays():
         """
         Überprüft die Geburtstage in der Liste und benachrichtigt über heutige oder morgige Geburtstage.
-        :param dates: Eine Liste mit den Namen und Geburtstagen im JSON Format.
         """
+        dates = Json().json_data
         today = datetime.date.today()
         tomorrow = (today + datetime.timedelta(days=1)).day
         day = today.day
@@ -44,29 +43,12 @@ class Birthday:
         if len(tomorrow_list) != 0:
             notification.notify(title="Morgen", message=" ".join(tomorrow_list), toast=True, timeout=3)
 
-    def open_window(self):
-        """
-        Öffnet ein Fenster zur Verwaltung der Geburtstage.
-        """
-        self.load_dates()
-        create.CreateBirthday()
-
-    def load_dates(self):
-        """
-        Lädt Geburtstagsdaten aus einer JSON Datei.
-        Falls diese nicht vorhanden sein, dann wird eine neue Datei erstellt.
-        """
-        file_name = "geburtstage.json"
-
-        if os.path.isfile(file_name):
-            file = open(file_name, "r")
-            dates = json.load(file)
-            create.CreateBirthday.dates = dates
-
-            self.check_birthdays(dates)
-        else:
-            validator.DataValidator().save_in_json(dates={})
+    @classmethod
+    def run(cls):
+        Json().load_json_file()
+        cls.check_birthdays()
+        BaseGUI().run()
 
 
 if __name__ == "__main__":
-    Birthday.open_window(Birthday())
+    Birthday().run()

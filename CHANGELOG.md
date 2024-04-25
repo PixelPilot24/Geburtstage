@@ -2,6 +2,25 @@
 Alle nennenswerten Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
 
+## [1.0.0] - 24.04.2024
+### Added
++ [json_handler.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/json_handler.py) in der Datei wird die
+JSON Datei gespeichert und aufgerufen
+
+### Changed
++ die Klassen in [createDataWindow.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/createDataWindow.py)
+überarbeitet und anders verteilt
++ [validator.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/validator.py)
+  + [save_in_json()](https://github.com/PixelPilot24/Geburtstage/blob/0.3.0/src/validator.py#L107) wurde nach
+  [json_handler.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/json_handler.py#L10) verschoben
++ [main.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/main.py)
+  + [open_window()](https://github.com/PixelPilot24/Geburtstage/blob/0.3.0/src/main.py#L47) zu
+  [run()](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/main.py#L47) geändert
+  + [load_dates()](https://github.com/PixelPilot24/Geburtstage/blob/0.3.0/src/main.py#L54) nach
+  [json_handler.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/json_handler.pyL#15) verschoben und wurde
+  in load_json_file umbenannt
++ [autostart.py](https://github.com/PixelPilot24/Geburtstage/blob/1.0.0/src/autostart.py#L4) angepasst
+
 ## [0.3.0] - 22.04.2024
 ### Added
 + [validator.py](https://github.com/PixelPilot24/Geburtstage/blob/0.3.0/src/validator.py)

@@ -1,160 +1,127 @@
-import validator
-
 from tkinter import *
 from tkinter import messagebox
+from validator import DataValidator as Validator
+from json_handler import JsonHandler as Json
 
 
-class CreateDataWindow:
-    def __init__(self, dates: dict):
-        self.root = None
-        self.canvas = Canvas()
-        self.inner_frame = Frame()
-        self._new_dates = dates
-        self._cache_dates = list(dates.keys())
-        self.validator = validator.DataValidator()
+class BaseGUI:
+    def __init__(self):
+        self.__dates = Json().json_data
+        self.__root = Tk()
+        self.__canvas = Canvas(master=self.__root, scrollregion=(0, 0, 700, 700))
+        self.__inner_frame = Frame(master=self.__canvas)
+        self.__frame_dict = {}
+        self.__setup_window()
 
-    def __initial_window(self):
-        self.root = Tk()
-        self.root.title("Geburtstage Liste")
-        self.root.geometry("600x150")
-        self.root.focus_force()
-
-    def __on_mouse_wheel(self, event: Event):
-        self.canvas.xview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    def _text_label_str(self, name: str, date: str) -> str:
-        age = self.validator.calculate_age(date)
-        new_date = date[8:10] + "." + date[5:7] + "." + date[0:4]
-
-        return f"{name}\n{age} Jahre\n{new_date}"
-
-    def _add_menu(self, name: str, date: str, frame: Frame, label: Label, index: int):
-        data_handler = DataHandler(self._new_dates)
-        menu = Menu(master=label, tearoff=0)
-
-        menu.add_command(label="Bearbeiten", command=lambda:
-                         data_handler.edit_data(name, date, frame, label, index, self.root))
-        menu.add_command(label="Löschen", command=lambda: data_handler.remove_birthday(index, frame, self.root))
-
-        label.bind("<Button-3>", lambda event: menu.post(event.x_root, event.y_root))
-
-    def __create_widgets(self):
-        pad = 5
-        dates_keys = list(self._new_dates.keys())
-        dates_values = list(self._new_dates.values())
-
-        for index in range(len(dates_keys)):
-            value = dates_values[index]
-            name = dates_keys[index]
-            dates_text = self._text_label_str(name, value)
-
-            frame = Frame(master=self.inner_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
-            text_label = Label(master=frame, text=dates_text, padx=pad)
-
-            text_label.pack(side=LEFT)
-            self._add_menu(name, value, frame, text_label, index)
-            frame.pack(side=LEFT, padx=10, pady=10, anchor=W)
-
-    def create_window(self):
-        self.__initial_window()
-
-        self.canvas = Canvas(master=self.root, scrollregion=(0, 0, 700, 700))
-        self.canvas.bind_all("<MouseWheel>", self.__on_mouse_wheel)
-
-        self.inner_frame = Frame(self.canvas)
-        self.canvas.create_window((0, 0), window=self.inner_frame, anchor=NW)
-
+    def __setup_window(self):
+        self.__root.title("Geburtstage Liste")
+        self.__root.focus_force()
+        self.__canvas.bind_all("<MouseWheel>", self.__on_mouse_wheel)
+        self.__canvas.create_window((0, 0), window=self.__inner_frame, anchor=NW)
         self.__create_widgets()
 
-        self.canvas.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox(ALL))
-        scrollbar = Scrollbar(master=self.root, orient=HORIZONTAL)
-        scrollbar.pack(side=BOTTOM, fill=X)
-        scrollbar.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=scrollbar.set)
-        self.canvas.pack(side=BOTTOM, fill=BOTH, expand=True)
+    def __on_mouse_wheel(self, event: Event):
+        self.__canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-        self.root.mainloop()
+    def __create_widgets(self):
+        index = 0
+        pad = 5
+
+        for name, date in self.__dates.items():
+            row = index // 6
+            column = index - (row * 6)
+            frame = Frame(master=self.__inner_frame, relief=RIDGE, borderwidth=2, padx=pad, pady=pad)
+            BirthdayLabel(frame, name, date, pad, self.__inner_frame)
+            frame.grid(row=row, column=column, padx=pad, pady=pad)
+            self.__frame_dict[name] = frame
+            index += 1
+
+        self.__canvas.update_idletasks()
+        self.__resize_window()
+        self.__create_scrollbar()
+
+    def __create_scrollbar(self):
+        self.__canvas.config(scrollregion=self.__canvas.bbox(ALL))
+        scrollbar_x = Scrollbar(master=self.__root, orient=HORIZONTAL)
+        scrollbar_y = Scrollbar(master=self.__root, orient=VERTICAL)
+
+        scrollbar_x.pack(side=BOTTOM, fill=X)
+        scrollbar_y.pack(side=RIGHT, fill=Y)
+
+        scrollbar_x.config(command=self.__canvas.xview)
+        scrollbar_y.config(command=self.__canvas.yview)
+
+        self.__canvas.config(xscrollcommand=scrollbar_x.set, yscrollcommand=scrollbar_y.set)
+        self.__canvas.pack(fill=BOTH, expand=True)
+
+    def __resize_window(self):
+        width = self.__inner_frame.winfo_reqwidth() + 21
+
+        self.__root.geometry(f"{width}x{width}")
+
+    def run(self):
+        self.__root.mainloop()
 
 
-class DataHandler(CreateDataWindow):
-    """
-    In dieser Klasse werden die Geburtstagsdaten gelöscht.
-    """
+class BirthdayLabel:
+    def __init__(self, frame: Frame, name: str, date: str, pad: int, canvas):
+        self.canvas = canvas
+        self.__frame = frame
+        self.__name = name
+        self.__date = date
+        self.__pad = pad
+        self.__create_label()
 
-    def remove_birthday(self, index: int, frame: Frame, root: Tk):
-        """
-        Die Löschung des Geburtstages und des Namen.
-        :param root:
-        :param index: Gibt den Index an, an welcher Stelle sich der Key in der Liste befindet.
-        :param frame: Die Zeile mit den Daten und dem Knopf die gelöscht werden sollen.
-        """
-        name = self._cache_dates[index]
-        delete_option = messagebox.askyesno(
-            "Löschen", f"Sollen die Daten von {name} wirklich gelöscht werden?"
-        )
+    def __create_label(self):
+        pad = self.__pad
+        dates_text = self.__text_label_str()
 
-        if delete_option:
-            self._new_dates.pop(name)
-            frame.pack_forget()
-            self.validator.save_in_json(self._new_dates)
+        text_label = Label(master=self.__frame, text=dates_text, padx=pad, pady=pad)
+        text_label.pack()  # side=LEFT
+        self.__add_menu(text_label)
 
-        root.focus_force()
+    def __text_label_str(self) -> str:
+        date = self.__date
+        validator = Validator()
+        age = validator.calculate_age(date)
+        new_date = f"{date[8:10]}.{date[5:7]}.{date[0:4]}"
 
-    def __save_change(self, day: str, month: str, year: str, name: str, old_name: str, index: int,
-                      frame: Frame, entry_frame: Frame, root: Tk):
-        date = f"{year}-{month}-{day}"
-        vali = validator.DataValidator()
+        return f"{self.__name}\n{age} Jahre\n{new_date}"
 
-        if (vali.check_day(day) != "" and
-                vali.check_month(month) != "" and
-                vali.check_year(year) != ""):
-            entry_frame.pack_forget()
-            if name == old_name:
-                self._new_dates[old_name] = date
-            else:
-                self._new_dates.pop(old_name)
-                self._new_dates[name] = date
+    def __add_menu(self, text_label: Label):
+        menu = Menu(master=text_label, tearoff=0)
+        menu.add_command(label="Bearbeiten", command=lambda: self.__edit_birthday(text_label))
+        menu.add_command(label="Löschen", command=self.__remove_birthday)
 
-            dates_text = self._text_label_str(name, date)
-            text_label = Label(master=frame, text=dates_text, padx=5)
+        text_label.bind("<Button-3>", lambda event: menu.post(event.x_root, event.y_root))
 
-            text_label.pack(side=LEFT)
-            self._add_menu(name, date, frame, text_label, index)
-
-            self.inner_frame.update_idletasks()
-
-            self.validator.save_in_json(self._new_dates)
-
-        root.focus_force()
-
-    def edit_data(self, name: str, date: str, frame: Frame, text_label: Label, index: int, root: Tk):
+    def __edit_birthday(self, text_label: Label):
+        name = self.__name
+        date = self.__date
         split_date = date.split("-")
-        day = split_date[2]
-        month = split_date[1]
-        year = split_date[0]
-        vali = validator.DataValidator()
+        day, month, year = split_date[2], split_date[1], split_date[0]
+        validator = Validator()
 
         text_label.pack_forget()
 
-        entry_frame = Frame(master=frame)
+        entry_frame = Frame(master=self.__frame)
         name_entry = Entry(master=entry_frame)
         day_entry = Entry(master=entry_frame, width=4, justify=CENTER)
         month_entry = Entry(master=entry_frame, width=4, justify=CENTER)
         year_entry = Entry(master=entry_frame, width=6, justify=CENTER)
         save_button = Button(master=entry_frame, text="Speichern", anchor=CENTER)
 
-        save_button.config(command=lambda n=name, e=entry_frame: self.__save_change(
-            day_entry.get(), month_entry.get(), year_entry.get(), name_entry.get(), n, index, frame, e, root))
-
         name_entry.insert(0, name)
         day_entry.insert(0, day)
         month_entry.insert(0, month)
         year_entry.insert(0, year)
 
-        day_entry.bind("<Key>", lambda event, e=day_entry: vali.check_input(event, e))
-        month_entry.bind("<Key>", lambda event, e=month_entry: vali.check_input(event, e))
-        year_entry.bind("<Key>", lambda event, e=year_entry: vali.check_input(event, e, 3))
+        save_button.config(command=lambda: self.__save_change(
+            name_entry.get(), [day_entry.get(), month_entry.get(), year_entry.get()], entry_frame))
+
+        day_entry.bind("<Key>", lambda event, e=day_entry: validator.check_input(event, e))
+        month_entry.bind("<Key>", lambda event, e=month_entry: validator.check_input(event, e))
+        year_entry.bind("<Key>", lambda event, e=year_entry: validator.check_input(event, e, 3))
 
         name_entry.pack()
         day_entry.pack()
@@ -163,4 +130,29 @@ class DataHandler(CreateDataWindow):
         save_button.pack()
         entry_frame.pack()
 
-        self.inner_frame.update_idletasks()
+    def __save_change(self, name: str, date: list, entry_frame: Frame):
+        validator = Validator()
+        day, month, year = date[0], date[1], date[2]
+        new_date = f"{year}-{month}-{day}"
+
+        if (validator.check_day(day) != ""
+                and validator.check_month(month) != ""
+                and validator.check_year(year) != ""):
+            entry_frame.pack_forget()
+            self.__dates = Json().json_data
+            self.__dates[name] = new_date
+            self.__name = name
+            self.__date = new_date
+            self.__create_label()
+            Json().save_in_json(self.__dates)
+
+    def __remove_birthday(self):
+        name = self.__name
+        delete_option = messagebox.askyesno(
+            "Löschen", f"Sollen die Daten von {name} wirklich gelöscht werden?")
+
+        if delete_option:
+            self.__dates = Json().json_data
+            self.__dates.pop(name)
+            Json().save_in_json(self.__dates)
+            self.__frame.destroy()
